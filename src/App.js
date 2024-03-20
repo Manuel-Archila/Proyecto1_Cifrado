@@ -1,20 +1,24 @@
 import './App.css';
 import React from 'react';
 import { Button, Divider, Form, Input, message } from 'antd';
-
-
-const onFinish = (values) => {
-  message.success('Success');
-  console.log('Success:', values);
-};
-
-const onFinishFailed = (errorInfo) => {
-  message.error('Failed');
-  console.log('Failed:', errorInfo);
-};
+import { useNavigate } from 'react-router-dom';
 
 
 function App() {
+  const navigate = useNavigate();
+
+
+  const onFinish = (values) => {
+    message.success('Success');
+    console.log('Success:', values);
+    navigate('/messages');
+  };
+  
+  const onFinishFailed = (errorInfo) => {
+    message.error('Failed');
+    console.log('Failed:', errorInfo);
+  };
+
   return (
     <div className='App'>
       <div className='app-grouped-forms'>

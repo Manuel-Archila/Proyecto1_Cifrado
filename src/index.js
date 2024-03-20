@@ -1,14 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-// import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import NoPage from './components/NoPage/NoPage';
+import MessagesList from './components/MessagesList/MessagesList';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' element={<App />} />
+        <Route path='/messages' element={<MessagesList />}/>
+        <Route path='*' element={<NoPage />} />
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>
 );
 
