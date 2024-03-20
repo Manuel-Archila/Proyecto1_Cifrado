@@ -1,4 +1,3 @@
-import { Divider } from 'antd';
 import MessageTile from '../MessageTile/MessageTile';
 import './MessagesList.css';
 import React from 'react';
@@ -47,15 +46,15 @@ function MessagesList() {
         ]
     }
 
-    const getGroupMessages = (id) => {
-        // * Fetch group messages *
+    // const getGroupMessages = (id) => {
+    //     // * Fetch group messages *
 
-        return [
-            {},
-            {},
-            {}
-        ]
-    }
+    //     return [
+    //         {},
+    //         {},
+    //         {}
+    //     ]
+    // }
 
     const messages = getMessages('usuario');
 

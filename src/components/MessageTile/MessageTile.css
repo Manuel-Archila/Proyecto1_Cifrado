@@ -1,0 +1,18 @@
+.message-tile {
+    display: grid;
+}
+
+.message-tile-content {
+    padding: 1rem;
+}
+
+#avatar_icon {
+    margin: 1rem;
+}
+
+#message-content {
+    max-width: 20%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

@@ -13,15 +13,25 @@ function MessageTile({ message }) {
         navigate(`/messages/${message.id}`);
     }
 
+    let avatar_color = {
+        color: 'lightgreen'
+    };
+
+    if(message.group_id){
+        avatar_color = {
+            color: 'red'
+        };
+    }
+
     return (
         <div onClick={goToMessage} className='message-tile'>
-            <Avatar size={64} icon={<UserOutlined />} />
+            <Avatar id='avatar_icon' style={avatar_color} size={64} icon={<UserOutlined />} />
             <div className='message-tile-content'>
                 <p>From: {message.username_origen}</p>
-                <p>To: {message.username_destino}</p>
-                <p>{message.message}</p>
+                <p>To: {!message.group_id ? message.username_destino : `Grupo #${message.group_id}`}</p>
+                <p id='message-content'>{message.message}</p>
             </div>
-            <Divider />
+            <Divider style={{borderTop: '1px solid #252525'}}/>
         </div>
     );
 }
