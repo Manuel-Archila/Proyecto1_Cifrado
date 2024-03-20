@@ -13,7 +13,7 @@ root.render(
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<App />} />
-        <Route path='/messages' element={<MessagesList />}/>
+        <Route exact path='/messages' element={<MessagesList />}/>
         <Route path='*' element={<NoPage />} />
       </Routes>
     </BrowserRouter>

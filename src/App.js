@@ -20,7 +20,7 @@ function App() {
   };
 
   return (
-    <div className='App'>
+    <div className='AppBg'>
       <div className='app-grouped-forms'>
         <Form
           className='app-form'
