@@ -6,6 +6,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import NoPage from './components/NoPage/NoPage';
 import MessagesList from './components/MessagesList/MessagesList';
+import SingleMessageView from './components/SingleMessageView/SingleMessageView';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -14,6 +15,7 @@ root.render(
       <Routes>
         <Route path='/' element={<App />} />
         <Route exact path='/messages' element={<MessagesList />}/>
+        <Route path="/messages/:id" element={<SingleMessageView />} />
         <Route path='*' element={<NoPage />} />
       </Routes>
     </BrowserRouter>

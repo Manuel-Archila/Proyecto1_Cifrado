@@ -35,6 +35,11 @@ function MessageTile({ message }) {
             <Divider id='message_divider' style={{borderTop: '1px solid #252525'}}/>
         </div>
     );
+    // return (
+    //     <div onClick={goToMessage} className='message-tile'>
+    //         {/* Contenido del mensaje */}
+    //     </div>
+    // );
 }
 
 export default MessageTile;

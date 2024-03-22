@@ -1,0 +1,77 @@
+/* SingleMessageView.css */
+
+/* Importa estilos de App.css */
+@import url('../../App.css');
+
+/* Estilos para el contenedor principal */
+.single-message-container {
+    /* Los estilos de App.css se heredarán */
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.33); /* Mismo fondo que el listado de mensajes */
+    box-shadow: 0px 16px 64px 0 rgba(0, 0, 0, 0.33);
+    backdrop-filter: blur(4px);
+    border-radius: 10px;
+    width: 50%;
+    height: 50%;
+}
+
+/* Estilos para el título de la vista */
+.message-title {
+    font-size: 24px;
+    margin-bottom: 10px;
+    text-align: center;
+    color: rgb(55, 62, 68);
+    background-color: rgba(240, 248, 255, 0.335);
+    padding: 1rem;
+    border-radius: 5px;
+}
+
+/* Estilos para los detalles del mensaje */
+.message-details {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+/* Estilos para el contenido del mensaje */
+.message-content {
+    font-size: 24px;
+    margin-bottom: 10px;
+    text-align: left;
+    color: rgb(55, 62, 68);
+    background-color: rgba(240, 248, 255, 0.335);
+    padding: 1rem;
+    width: auto;
+    height: 62%;
+    border-radius: 5px;
+}
+
+/* Estilos para los elementos de desplazamiento */
+.single-message-container::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    border-radius: 10px;
+    background-color: #565656;
+}
+
+.single-message-container::-webkit-scrollbar {
+    width: 12px;
+    background-color: #565656;
+}
+
+.single-message-container::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    background-color: #262626;
+}
+
+.single-message-view-container #avatar_icon {
+    position: absolute;
+    top: 45px;
+    right: 20px;
+    color: lightgreen; /* Color del avatar */
+    font-size: 25px; /* Tamaño del avatar */
+}
+
+
