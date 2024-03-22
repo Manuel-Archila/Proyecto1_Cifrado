@@ -11,13 +11,14 @@ function MessageTile({ message }) {
 
     const goToMessage = () => {
         navigate(`/messages/${message.id}`);
+        console.log(message)
     }
 
     let avatar_color = {
         color: 'lightgreen'
     };
 
-    if(message.group_id){
+    if(message.id_group){
         avatar_color = {
             color: 'red'
         };
@@ -25,13 +26,13 @@ function MessageTile({ message }) {
 
     return (
         <div onClick={goToMessage} className='message-tile'>
-            <Avatar id='avatar_icon' style={avatar_color} size={64} icon={<UserOutlined />} />
             <div className='message-tile-content'>
-                <p>From: {message.username_origen}</p>
-                <p>To: {!message.group_id ? message.username_destino : `Grupo #${message.group_id}`}</p>
-                <p id='message-content'>{message.message}</p>
+                <Avatar id='avatar_icon' style={avatar_color} size={64} icon={<UserOutlined />} />
+                <p className='msg-content'>From: {message.id_group ?  message.author : message.username_origen}</p>
+                {/* <p className='msg-content'>To: {message.id_group ? `Grupo #${message.id_group}` : message.username_destino }</p> */}
+                {/* <p id='message-content'>{message.message}</p> */}
             </div>
-            <Divider style={{borderTop: '1px solid #252525'}}/>
+            <Divider id='message_divider' style={{borderTop: '1px solid #252525'}}/>
         </div>
     );
 }
