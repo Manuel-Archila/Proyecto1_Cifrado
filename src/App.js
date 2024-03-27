@@ -1,19 +1,75 @@
-import './App.css';
 import React from 'react';
 import { Button, Divider, Form, Input, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import './App.css';
 
+async function savePublicKey(username, publicKeyBase64) {
+ 
+  const response = await fetch('http://localhost:5000/users', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      username: username,
+      public_key: publicKeyBase64,
+    }),
+  })
+  
+  const data = await response.json();
+  console.log(data);
+}
 
 function App() {
   const navigate = useNavigate();
 
+  const generateAndStoreKeys = async () => {
+    const keyPair = await window.crypto.subtle.generateKey(
+      {
+        name: "RSA-OAEP",
+        modulusLength: 2048,
+        publicExponent: new Uint8Array([1, 0, 1]),
+        hash: {name: "SHA-256"},
+      },
+      true,
+      ["encrypt", "decrypt"]
+    );
 
-  const onFinish = (values) => {
-    message.success('Success');
-    console.log('Success:', values);
+    const exportedPublicKey = await window.crypto.subtle.exportKey(
+      "spki",
+      keyPair.publicKey
+    );
+
+    const exportedPrivateKey = await window.crypto.subtle.exportKey(
+      "pkcs8",
+      keyPair.privateKey
+    );
+
+    const publicKeyBase64 = btoa(String.fromCharCode(...new Uint8Array(exportedPublicKey)));
+    const privateKeyBase64 = btoa(String.fromCharCode(...new Uint8Array(exportedPrivateKey)));
+
+    sessionStorage.setItem('privateKey', privateKeyBase64);
+
+    return publicKeyBase64;
+  };
+
+  const onFinishRegister = async (values) => {
+    try {
+      const publicKeyBase64 = await generateAndStoreKeys();
+      await savePublicKey(values.username, publicKeyBase64);
+      message.success('Registration successful');
+      navigate('/messages');
+    } catch (error) {
+      message.error('Registration failed');
+      console.error('Registration Failed:', error);
+    }
+  };
+
+  const onFinishLogin = (values) => {
+    message.success('Login successful');
     navigate('/messages');
   };
-  
+
   const onFinishFailed = (errorInfo) => {
     message.error('Failed');
     console.log('Failed:', errorInfo);
@@ -29,7 +85,7 @@ function App() {
           wrapperCol={{ span: 16 }}
           initialValues={{ remember: true }}
           layout='horizontal'
-          onFinish={onFinish}
+          onFinish={onFinishRegister}
           onFinishFailed={onFinishFailed}
           autoComplete='off'
         >
@@ -55,11 +111,11 @@ function App() {
             rules={[
               { required: true, message: 'Confirm your password' },
               ({ getFieldValue }) => ({
-                validator(rule, value) {
+                validator(_, value) {
                   if (!value || getFieldValue('password') === value) {
                     return Promise.resolve();
                   }
-                  return Promise.reject('The two passwords do not match');
+                  return Promise.reject(new Error('The two passwords do not match'));
                 },
               }),
             ]}
@@ -71,7 +127,6 @@ function App() {
               Register
             </Button>
           </Form.Item>
-
         </Form>
         <Divider style={{ borderColor: 'black'}}></Divider>
         <Form
@@ -81,7 +136,7 @@ function App() {
           wrapperCol={{ span: 16 }}
           initialValues={{ remember: true }}
           layout='horizontal'
-          onFinish={onFinish}
+          onFinish={onFinishLogin}
           onFinishFailed={onFinishFailed}
           autoComplete='off'
         >
@@ -96,6 +151,7 @@ function App() {
           <Form.Item
             label="Password"
             name="password"
+            // Continue from the 'Password' Form.Item
             rules={[{ required: true, message: 'Enter your password' }]}
           >
             <Input.Password />
@@ -105,7 +161,6 @@ function App() {
               Login
             </Button>
           </Form.Item>
-
         </Form>
       </div>
     </div>
@@ -113,3 +168,4 @@ function App() {
 }
 
 export default App;
+

@@ -7,6 +7,7 @@ import reportWebVitals from './reportWebVitals';
 import NoPage from './components/NoPage/NoPage';
 import MessagesList from './components/MessagesList/MessagesList';
 import SingleMessageView from './components/SingleMessageView/SingleMessageView';
+import GroupMessagesView from './components/GroupMessageView/GroupMessageView';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -16,6 +17,7 @@ root.render(
         <Route path='/' element={<App />} />
         <Route exact path='/messages' element={<MessagesList />}/>
         <Route path="/messages/:id" element={<SingleMessageView />} />
+        <Route path='/group/:group' element={ <GroupMessagesView /> } />
         <Route path='*' element={<NoPage />} />
       </Routes>
     </BrowserRouter>

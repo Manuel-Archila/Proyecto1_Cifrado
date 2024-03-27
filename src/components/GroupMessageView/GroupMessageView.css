@@ -1,0 +1,59 @@
+/* GroupMessagesView.css */
+@import url('../../App.css');
+
+.group-messages-view-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+
+.messages-wrapper {
+    background-color: rgba(255, 255, 255, 0.5); /* Ajusta el color y la transparencia según tus preferencias */
+    border-radius: 10px; /* Bordes redondeados */
+    padding: 20px; /* Espaciado interno */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave para profundidad */
+    margin-top: 20px; /* Espacio entre el encabezado y los mensajes */
+}
+
+.group-message-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background-color: rgba(255, 255, 255, 0.33);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px; /* Espacio entre mensajes */
+}
+
+.message-header-group {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.message-sender, .message-content {
+    margin-bottom: 10px; 
+    color: rgb(55, 62, 68);
+}
+
+.message-content {
+    background-color: rgba(240, 248, 255, 0.335);
+    padding: 10px;
+    border-radius: 5px;
+    overflow-wrap: break-word;
+}
+
+.return-link {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    color: inherit; 
+    text-decoration: none;
+    font-weight: bold;
+    gap: 10px;
+}
+
+.return-icon {
+    font-size: 20px; 
+}
