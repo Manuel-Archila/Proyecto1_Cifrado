@@ -32,7 +32,7 @@ function MessageTile({ message }) {
         <div onClick={message.id_group ? goToGroup : goToMessage} className='message-tile'>
             <div className='message-tile-content'>
                 <Avatar id='avatar_icon' style={avatar_color} size={64} icon={<UserOutlined />} />
-                <p className='msg-content'>From: {message.id_group ?  message.author : message.username_origen}</p>
+                <p className='msg-content'>{message.id_group ? `ID group: ${message.id_group}` : `From: ${message.username_origen}`}</p>
                 {/* <p className='msg-content'>To: {message.id_group ? `Grupo #${message.id_group}` : message.username_destino }</p> */}
                 {/* <p id='message-content'>{message.message}</p> */}
             </div>
