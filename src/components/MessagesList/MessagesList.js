@@ -1,8 +1,32 @@
 import MessageTile from '../MessageTile/MessageTile';
 import './MessagesList.css';
-import React from 'react';
+import NewGroupModal from '../NewGroupModal/NewGroupModal';
+import NewMessageModal from '../NewMessageModal/NewMessageModal';
+import React, {useState} from 'react';
+
 
 function MessagesList() {
+
+
+    const [showModal, setShowModal] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [recipient, setRecipient] = useState('');
+    const [messageBody, setMessageBody] = useState('');
+    const [users, setUsers] = useState(['Messi', 'Xavi', 'Andres', 'Maria', 'Zack', 'Leo']);
+
+    const handleModalClose = () => {
+        setShowModal(false);
+    };
+
+    const toggleModal = () => setIsModalOpen(!isModalOpen);
+
+    const handleSend = () => {
+        console.log(`Sending message to ${recipient}: ${messageBody}`);
+        toggleModal();
+        // Restablece el estado del formulario
+        setRecipient('');
+        setMessageBody('');
+    };
 
     const getMessages = (username) => {
         // * Fetch messages *
@@ -47,7 +71,6 @@ function MessagesList() {
     }
 
     const getGroupMessages = (id) => {
-        // * Fetch group messages *
 
         return [
             {
@@ -83,20 +106,40 @@ function MessagesList() {
         <div className='AppBg'>
             <h1 style={{color: 'white'}}>Messages</h1>
             <div className='grouped-messages'>
-                <h2 id='header_messages'>Direct Messages</h2>    
-                {messages.map((message, index) => {
-                    return <MessageTile key={index} message={message} />
-                })}
-
-                <h2 id='header_messages'>Group Messages</h2>
-                {getGroupMessages().map((message, index) => {
-                    return <MessageTile key={index} message={message} />
-                })}
-
-
+                <div className='message-group'>
+                    <div className="header-container">
+                        <h2>Direct Messages</h2>
+                        <button className='new-message-button' onClick={toggleModal}>New Message</button>
+                    </div>
+                    {messages.map((message, index) => {
+                        return <MessageTile key={index} message={message} />
+                    })}
+                </div>
+                <div className='message-group'>
+                    <div className="header-container">
+                        <h2>Group Messages</h2>
+                        <button className='new-group-button' onClick={() => setShowModal(true)}>New Group</button>
+                    </div>
+                    {getGroupMessages().map((message, index) => {
+                        return <MessageTile key={index} message={message} />
+                    })}
+                </div>
             </div>
+            <NewGroupModal isOpen={showModal} onClose={handleModalClose} />
+            <NewMessageModal
+                isOpen={isModalOpen}
+                toggleModal={toggleModal}
+                users={users}
+                recipient={recipient}
+                setRecipient={setRecipient}
+                messageBody={messageBody}
+                setMessageBody={setMessageBody}
+                handleSend={handleSend}
+            />
         </div>
     );
+    
+    
 }
 
 export default MessagesList;

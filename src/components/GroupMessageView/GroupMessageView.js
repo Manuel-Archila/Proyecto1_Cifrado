@@ -1,12 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Avatar } from 'antd'; // Importa el componente Avatar de Ant Design
 import { UserOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import './GroupMessageView.css'; // Asegúrate de que el nombre del archivo CSS sea correcto
+import NewMessageModal from '../NewGroupMessageModal/NewGroupMessageModal'; // Ajusta la ruta según la estructura de tu proyecto
+
 
 function GroupMessagesView() {
     // Simulamos la obtención de los mensajes del grupo
     const [messages, setMessages] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [messageBody, setMessageBody] = useState('');
+    const [userActual, setUserActual] = useState('');
+    const { group } = useParams(); 
+
+    useEffect(() => {
+        setUserActual(sessionStorage.getItem('username'));
+    }, []);
+
+
+    const toggleModal = () => setIsModalOpen(!isModalOpen);
+
+    const handleSend = () => {
+        console.log("Mensaje enviado:", messageBody);
+        console.log("Usuario del mensaje:", userActual);
+        console.log("El ID del grupo es:", group)
+        
+
+        setMessageBody(''); 
+        toggleModal(); 
+};
+
 
     useEffect(() => {
         // Simula una llamada al API para obtener mensajes
@@ -26,8 +50,11 @@ function GroupMessagesView() {
                         <ArrowLeftOutlined className="return-icon" />
                         <span>Volver</span>
                     </Link>
+                    {/* Botón para abrir el modal */}
+                    <button onClick={toggleModal} className="send-message-button">Enviar Mensaje</button>
                 </div>
-                <div className="messages-wrapper"> {/* Contenedor agregado para los mensajes */}
+                <div className="messages-wrapper">
+                    {/* Renderización de mensajes existentes */}
                     {messages.map((message) => (
                         <div key={message.id} className="group-message-container">
                             <Avatar className="avatar" size={64} icon={<UserOutlined />} />
@@ -39,8 +66,17 @@ function GroupMessagesView() {
                     ))}
                 </div>
             </div>
+            {/* Renderizar NewMessageModal */}
+            <NewMessageModal
+                isOpen={isModalOpen}
+                toggleModal={toggleModal}
+                messageBody={messageBody}
+                setMessageBody={setMessageBody}
+                handleSend={handleSend}
+            />
         </div>
     );
+    
 }
 
 export default GroupMessagesView;

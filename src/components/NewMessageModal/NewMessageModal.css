@@ -1,0 +1,66 @@
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050; /* Asegura que el modal esté sobre otros elementos */
+}
+
+.modal-content {
+    position: relative; /* Permite posicionar absolutamente el botón de cerrar respecto a este contenedor */
+    background-color: #fff;
+    margin: auto;
+    padding: 40px; /* Aumenta el padding para más espacio alrededor del contenido */
+    border: 1px solid #888;
+    width: 50%; /* O ajusta según la anchura deseada */
+    max-width: 500px; /* Para evitar que sea demasiado ancho en pantallas grandes */
+    border-radius: 10px; /* Estilo opcional para bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave para dar profundidad */
+    overflow: hidden; /* Asegura que nada se desborde fuera del borde redondeado */
+}
+
+.close {
+    position: absolute;
+    top: 10px; /* Ajusta según la necesidad para alinear con el borde superior del modal */
+    right: 15px; /* Ajusta según la necesidad para alinear con el borde derecho del modal */
+    color: #000;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-content h2, .modal-content select, .modal-content textarea, .modal-content button {
+    margin-bottom: 20px; /* Aumenta el espacio entre los campos */
+}
+
+select, textarea {
+    width: calc(100% - 20px); /* Ajusta el ancho para compensar el padding */
+    padding: 10px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px; /* Estilo opcional para bordes redondeados */
+}
+
+textarea {
+    height: 100px; /* Ajusta la altura del textarea */
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px; /* Estilo opcional para bordes redondeados */
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.8;
+}

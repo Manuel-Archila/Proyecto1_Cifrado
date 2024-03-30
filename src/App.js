@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import './App.css';
 
 async function savePublicKey(username, publicKeyBase64) {
- 
   const response = await fetch('http://localhost:5000/users', {
     method: 'POST',
     headers: {
@@ -14,11 +13,29 @@ async function savePublicKey(username, publicKeyBase64) {
       username: username,
       public_key: publicKeyBase64,
     }),
-  })
+  });
   
   const data = await response.json();
   console.log(data);
 }
+
+async function updatePublicKey(publicKeyBase64) {
+  // Recuperar el username desde el sessionStorage
+  const username = sessionStorage.getItem('username');
+  const response = await fetch(`http://localhost:5000/users/${username}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      public_key: publicKeyBase64,
+    }),
+  });
+  
+  const data = await response.json();
+  console.log(data);
+}
+
 
 function App() {
   const navigate = useNavigate();
@@ -35,27 +52,21 @@ function App() {
       ["encrypt", "decrypt"]
     );
 
-    const exportedPublicKey = await window.crypto.subtle.exportKey(
-      "spki",
-      keyPair.publicKey
-    );
-
-    const exportedPrivateKey = await window.crypto.subtle.exportKey(
-      "pkcs8",
-      keyPair.privateKey
-    );
+    const exportedPublicKey = await window.crypto.subtle.exportKey("spki", keyPair.publicKey);
+    const exportedPrivateKey = await window.crypto.subtle.exportKey("pkcs8", keyPair.privateKey);
 
     const publicKeyBase64 = btoa(String.fromCharCode(...new Uint8Array(exportedPublicKey)));
     const privateKeyBase64 = btoa(String.fromCharCode(...new Uint8Array(exportedPrivateKey)));
 
     sessionStorage.setItem('privateKey', privateKeyBase64);
-
     return publicKeyBase64;
   };
 
   const onFinishRegister = async (values) => {
     try {
       const publicKeyBase64 = await generateAndStoreKeys();
+      // Guardar el username en sessionStorage
+      sessionStorage.setItem('username', values.username);
       await savePublicKey(values.username, publicKeyBase64);
       message.success('Registration successful');
       navigate('/messages');
@@ -64,11 +75,21 @@ function App() {
       console.error('Registration Failed:', error);
     }
   };
-
-  const onFinishLogin = (values) => {
-    message.success('Login successful');
-    navigate('/messages');
+  
+  const onFinishLogin = async (values) => {
+    try {
+      const publicKeyBase64 = await generateAndStoreKeys();
+      // Guardar el username en sessionStorage
+      sessionStorage.setItem('username', values.username);
+      await updatePublicKey(publicKeyBase64);
+      message.success('Login successful, keys updated.');
+      navigate('/messages');
+    } catch (error) {
+      message.error('Login failed. Could not update keys.');
+      console.error('Login Failed:', error);
+    }
   };
+  
 
   const onFinishFailed = (errorInfo) => {
     message.error('Failed');
@@ -168,4 +189,3 @@ function App() {
 }
 
 export default App;
-
