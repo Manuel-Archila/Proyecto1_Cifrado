@@ -2,23 +2,63 @@ import React, { useState } from 'react';
 // Asegúrate de importar el CSS si es diferente al del NewMessageModal
 import './NewGroupModal.css'; 
 
-function NewGroupModal({ isOpen, onClose }) {
+function NewGroupModal({ isOpen, onClose, allUsers }) {
     const [groupName, setGroupName] = useState('');
-    const [userList, setUserList] = useState('');
     const [password, setPassword] = useState('');
+    const [newUser, setNewUser] = useState('');
+    const [selectedUsers, setSelectedUsers] = useState([])
 
-    async function generateAndExportSymmetricKey() {
+
+    const handleAddUser = () => {
+        if (newUser && !selectedUsers.includes(newUser)) {
+            setSelectedUsers([...selectedUsers, newUser]); // Agrega el nuevo usuario a la lista
+            setNewUser(''); // Limpia el usuario seleccionado después de agregarlo
+        }
+    }
+
+    const encryptWithAES = async(text, key) => {
+        const iv = new Uint8Array(16); // IV estático, por simplicidad se utiliza un array de ceros.
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+    
+        const encrypted = await window.crypto.subtle.encrypt(
+            {
+                name: "AES-CBC",
+                iv,
+            },
+            key,
+            data
+        );
+    
+        return encrypted;
+    }
+
+    const generateStaticKey = async() => {
+        // Esta función generaría una clave estática.
+        // En la práctica, querrías tener una clave predefinida o derivada de alguna manera segura y consistente.
+        const key = await window.crypto.subtle.generateKey(
+            {
+                name: "AES-CBC",
+                length: 128,
+            },
+            true,
+            ["encrypt", "decrypt"]
+        );
+    
+        return key;
+    }
+
+    const generateAndExportSymmetricKey = async()=> {
         try {
             const key = await window.crypto.subtle.generateKey(
                 {
                     name: "AES-GCM",
-                    length: 256,
+                    length: 128,
                 },
                 true,
                 ["encrypt", "decrypt"]
             );
     
-            // Exportar la clave a formato raw
             const exportedKey = await window.crypto.subtle.exportKey("raw", key);
     
             return exportedKey;
@@ -27,9 +67,20 @@ function NewGroupModal({ isOpen, onClose }) {
             return null;
         }
     }
+    
 
-    function bufferToBase64(buf) {
+    const bufferToBase64 = (buf) => {
         return btoa(String.fromCharCode.apply(null, new Uint8Array(buf)));
+    }
+
+    const base64ToBuffer = (base64) => {
+        const binary_string = window.atob(base64);
+        const len = binary_string.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+            bytes[i] = binary_string.charCodeAt(i);
+        }
+        return bytes.buffer;
     }
     
     
@@ -44,13 +95,21 @@ function NewGroupModal({ isOpen, onClose }) {
     
         // Convertir la clave exportada a Base64
         const exportedKeyBase64 = bufferToBase64(exportedKeyBuffer);
-        console.log("Clave simétrica en Base64:", exportedKeyBase64);
-    
+        
+        const aesKey = await generateStaticKey(); // Asegúrate de tener esta clave generada y accesible
+        const encryptedPassword = await encryptWithAES(password, aesKey);
+        const encryptedPasswordBase64 = bufferToBase64(encryptedPassword);
+        
+        
         console.log("Nombre del grupo:", groupName);
-        console.log("Lista de usuarios:", userList);
+        console.log("Lista de usuarios:", selectedUsers);
         console.log("Contraseña:", password);
-    
-        // Aquí iría la lógica para usar la clave exportada
+        console.log("Clave simétrica en Base64:", exportedKeyBase64);
+        console.log("Clave simétrica en Base64:", encryptedPasswordBase64);
+
+        setGroupName('');
+        setSelectedUsers([]);
+        setPassword('');
     
         onClose(); // Cierra el modal
     };
@@ -70,12 +129,23 @@ function NewGroupModal({ isOpen, onClose }) {
                     value={groupName}
                     onChange={(e) => setGroupName(e.target.value)}
                 />
-                <input
-                    type="text"
-                    placeholder="User List (comma separated)"
-                    value={userList}
-                    onChange={(e) => setUserList(e.target.value)}
-                />
+                <select
+                    value={newUser}
+                    onChange={(e) => setNewUser(e.target.value)}
+                >
+                    <option value="">Select User</option>
+                    {allUsers.map((user) => (
+                        <option key={user.id} value={user.username}>
+                            {user.username}
+                        </option>
+                    ))}
+                </select>
+                <button onClick={handleAddUser}>Add User</button>
+                <div>
+                    {selectedUsers.map((user, index) => (
+                        <div key={index}>{user}</div>
+                    ))}
+                </div>
                 <input
                     type="password"
                     placeholder="Password"

@@ -99,7 +99,7 @@ function MessagesList() {
                     })}
                 </div>
             </div>
-            <NewGroupModal isOpen={showModal} onClose={handleModalClose} />
+            <NewGroupModal isOpen={showModal} onClose={handleModalClose} allUsers={users}/>
         </div>
     );
     
