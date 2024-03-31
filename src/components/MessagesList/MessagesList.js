@@ -2,7 +2,7 @@ import MessageTile from '../MessageTile/MessageTile';
 import './MessagesList.css';
 import NewGroupModal from '../NewGroupModal/NewGroupModal';
 import NewMessageModal from '../NewMessageModal/NewMessageModal';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 
 function MessagesList() {
@@ -12,7 +12,43 @@ function MessagesList() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [recipient, setRecipient] = useState('');
     const [messageBody, setMessageBody] = useState('');
-    const [users, setUsers] = useState(['Messi', 'Xavi', 'Andres', 'Maria', 'Zack', 'Leo']);
+    const [users, setUsers] = useState([]);
+    const [groups, setGroups] = useState([]);
+    const [groupsReal, setGroupsReal] = useState([]);
+    const [userActual, setUserActual] = useState('');
+
+    const getUsers = async() => {
+        try{
+            const response = await fetch('http://localhost:5000/users');
+            const data = await response.json();
+            console.log(data);
+            setUsers(data);
+        }
+        catch(error){
+            console.log(error);
+        }
+        
+        
+    }
+
+    const getGroupsReal = async(groups, userActual, setGroupsReal) => {
+        const filteredGroups = groups.filter(group => group.usuarios.includes(userActual));
+        setGroupsReal(filteredGroups);
+    }
+
+
+    const getGroups = async() => {
+        try{
+            const response = await fetch('http://localhost:5000/groups');
+            const data = await response.json();
+            console.log(data);
+            setGroups(data);
+        }
+        catch(error){
+            console.log(error);
+        }
+
+    }
 
     const handleModalClose = () => {
         setShowModal(false);
@@ -28,79 +64,17 @@ function MessagesList() {
         setMessageBody('');
     };
 
-    const getMessages = (username) => {
-        // * Fetch messages *
-        return [
-            {
-                id: '1',
-                message: 'Hola, como estas?',
-                username_origen : 'Messi',
-                username_destino: 'Xavi'
-            },
-            {
-                id: '2',
-                message: 'fdsafdsaf',
-                username_origen : 'Andres',
-                username_destino: 'Maria'
-            },
-            {
-                id: '3',
-                message: 'Adios!',
-                username_origen : 'Zack',
-                username_destino: 'Leo'
-            },
-            {
-                id: '4',
-                message: 'Hola, como estas?',
-                username_origen : 'Messi',
-                username_destino: 'Xavi'
-            },
-            {
-                id: '5',
-                message: 'fdsafdsaf',
-                username_origen : 'Andres',
-                username_destino: 'Maria'
-            },
-            {
-                id: '6',
-                message: 'Adios!',
-                username_origen : 'Zack',
-                username_destino: 'Leo'
-            }
-        ]
-    }
+    useEffect(() => {
+        getUsers();
+        getGroups();
+        setUserActual(sessionStorage.getItem('username'));
+    }, []);
 
-    const getGroupMessages = (id) => {
+    useEffect(() => {
 
-        return [
-            {
-                id: '1',
-                id_group: '1',
-                author: 'Ronaldinho',
-                message: 'Sale furbito?',
-            },
-            {
-                id: '2',
-                id_group: '1',
-                author: 'Andres',
-                message: 'Claro que si',
-            },
-            {
-                id: '3',
-                id_group: '2',
-                author: 'Alan',
-                message: 'Hola, desde el grupo 2',
-            },
-            {
-                id: '4',
-                id_group: '3',
-                author: 'Jessie',
-                message: 'Hola, desde el grupo 3',
-            }
-        ]
-    }
+        getGroupsReal(groups, userActual, setGroupsReal);
 
-    const messages = getMessages('usuario');
+    }, [groups]);
 
     return (
         <div className='AppBg'>
@@ -109,10 +83,10 @@ function MessagesList() {
                 <div className='message-group'>
                     <div className="header-container">
                         <h2>Direct Messages</h2>
-                        <button className='new-message-button' onClick={toggleModal}>New Message</button>
+                        {/* <button className='new-message-button' onClick={toggleModal}>New Message</button> */}
                     </div>
-                    {messages.map((message, index) => {
-                        return <MessageTile key={index} message={message} />
+                    {users.length === 0 ? <p>Loading...</p> : users.map((user, index) => {
+                        return <MessageTile key={index} message={user} />
                     })}
                 </div>
                 <div className='message-group'>
@@ -120,22 +94,12 @@ function MessagesList() {
                         <h2>Group Messages</h2>
                         <button className='new-group-button' onClick={() => setShowModal(true)}>New Group</button>
                     </div>
-                    {getGroupMessages().map((message, index) => {
-                        return <MessageTile key={index} message={message} />
+                    {groupsReal.length === 0 ? <p>No groups available</p> : groupsReal.map((nombre, index) => {
+                        return <MessageTile key={index} message={nombre} />
                     })}
                 </div>
             </div>
             <NewGroupModal isOpen={showModal} onClose={handleModalClose} />
-            <NewMessageModal
-                isOpen={isModalOpen}
-                toggleModal={toggleModal}
-                users={users}
-                recipient={recipient}
-                setRecipient={setRecipient}
-                messageBody={messageBody}
-                setMessageBody={setMessageBody}
-                handleSend={handleSend}
-            />
         </div>
     );
     

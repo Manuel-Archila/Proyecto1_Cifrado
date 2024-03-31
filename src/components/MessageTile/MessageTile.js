@@ -7,14 +7,17 @@ import { UserOutlined } from '@ant-design/icons';
 
 function MessageTile({ message }) {
 
+
     const navigate = useNavigate();
 
+    
+
     const goToMessage = () => {
-        navigate(`/messages/${message.id}`);
+        navigate(`/messages/${message.username}`);
         console.log(message)
     }
     const goToGroup = () => {
-        navigate(`/group/${message.id_group}`);
+        navigate(`/group/${message.nombre}`);
         console.log(message)
     }
 
@@ -22,17 +25,17 @@ function MessageTile({ message }) {
         color: 'lightgreen'
     };
 
-    if(message.id_group){
+    if(message.nombre){
         avatar_color = {
             color: 'red'
         };
     }
 
     return (
-        <div onClick={message.id_group ? goToGroup : goToMessage} className='message-tile'>
+        <div onClick={message.nombre ? goToGroup : goToMessage} className='message-tile'>
             <div className='message-tile-content'>
                 <Avatar id='avatar_icon' style={avatar_color} size={64} icon={<UserOutlined />} />
-                <p className='msg-content'>{message.id_group ? `ID group: ${message.id_group}` : `From: ${message.username_origen}`}</p>
+                <p className='msg-content'>{message.nombre ? `Nombre del grupo: ${message.nombre}` : `From: ${message.username}`}</p>
                 {/* <p className='msg-content'>To: {message.id_group ? `Grupo #${message.id_group}` : message.username_destino }</p> */}
                 {/* <p id='message-content'>{message.message}</p> */}
             </div>

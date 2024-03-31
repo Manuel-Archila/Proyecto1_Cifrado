@@ -2,7 +2,7 @@
 import React from 'react';
 import './NewMessageModal.css'; // Asume que tienes estilos específicos para el modal
 
-const NewMessageModal = ({ isOpen, toggleModal, users, recipient, setRecipient, messageBody, setMessageBody, handleSend }) => {
+const NewMessageModal = ({ isOpen, toggleModal, messageBody, setMessageBody, handleSend }) => {
     if (!isOpen) return null;
 
     return (
@@ -10,15 +10,6 @@ const NewMessageModal = ({ isOpen, toggleModal, users, recipient, setRecipient, 
             <div className="modal-content">
                 <span className="close" onClick={toggleModal}>&times;</span>
                 <h2>New Message</h2>
-                <select
-                    value={recipient}
-                    onChange={(e) => setRecipient(e.target.value)}
-                >
-                    <option value="">Select a user</option>
-                    {users.map((user, index) => (
-                        <option key={index} value={user}>{user}</option>
-                    ))}
-                </select>
                 <textarea
                     placeholder="Your message here..."
                     value={messageBody}

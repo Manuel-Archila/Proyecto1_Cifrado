@@ -16,7 +16,7 @@ root.render(
       <Routes>
         <Route path='/' element={<App />} />
         <Route exact path='/messages' element={<MessagesList />}/>
-        <Route path="/messages/:id" element={<SingleMessageView />} />
+        <Route path="/messages/:username" element={<SingleMessageView />} />
         <Route path='/group/:group' element={ <GroupMessagesView /> } />
         <Route path='*' element={<NoPage />} />
       </Routes>
