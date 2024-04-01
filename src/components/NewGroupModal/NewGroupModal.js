@@ -7,6 +7,29 @@ function NewGroupModal({ isOpen, onClose, allUsers }) {
     const [password, setPassword] = useState('');
     const [newUser, setNewUser] = useState('');
     const [selectedUsers, setSelectedUsers] = useState([])
+    const [clave_simetrica, setClaveSimetrica] = useState('');
+
+    const createNewGroup = async() => {
+        try {
+            const response = await fetch('http://localhost:5000/groups', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    nombre: groupName,
+                    usuarios: selectedUsers,
+                    contrasena: password,
+                    clave_simetrica: clave_simetrica,
+                }),
+            });
+            const data = await response.json();
+            console.log(data);
+        } catch (error) {
+            console.error('Error creating group:', error);
+        }
+
+    }
 
 
     const handleAddUser = () => {
@@ -34,8 +57,6 @@ function NewGroupModal({ isOpen, onClose, allUsers }) {
     }
 
     const generateStaticKey = async() => {
-        // Esta función generaría una clave estática.
-        // En la práctica, querrías tener una clave predefinida o derivada de alguna manera segura y consistente.
         const key = await window.crypto.subtle.generateKey(
             {
                 name: "AES-CBC",
@@ -92,26 +113,28 @@ function NewGroupModal({ isOpen, onClose, allUsers }) {
             console.error("No se pudo generar la clave.");
             return;
         }
-    
-        // Convertir la clave exportada a Base64
         const exportedKeyBase64 = bufferToBase64(exportedKeyBuffer);
+        setClaveSimetrica(exportedKeyBase64);
         
         const aesKey = await generateStaticKey(); // Asegúrate de tener esta clave generada y accesible
         const encryptedPassword = await encryptWithAES(password, aesKey);
         const encryptedPasswordBase64 = bufferToBase64(encryptedPassword);
+        setPassword(encryptedPasswordBase64);
         
         
         console.log("Nombre del grupo:", groupName);
         console.log("Lista de usuarios:", selectedUsers);
         console.log("Contraseña:", password);
         console.log("Clave simétrica en Base64:", exportedKeyBase64);
-        console.log("Clave simétrica en Base64:", encryptedPasswordBase64);
+        console.log("Contrasena en Base64:", encryptedPasswordBase64);
+
+        createNewGroup();
 
         setGroupName('');
         setSelectedUsers([]);
         setPassword('');
     
-        onClose(); // Cierra el modal
+        onClose();
     };
     
     

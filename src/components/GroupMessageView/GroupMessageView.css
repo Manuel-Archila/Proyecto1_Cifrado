@@ -2,10 +2,10 @@
 @import url('../../App.css');
 
 .group-messages-view-container {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    max-height: 80vh; /* Ajusta esto según lo que necesites */
+    overflow-y: auto; /* Habilita el desplazamiento vertical */
     padding: 20px;
+    width: 60%;
 }
 
 .messages-wrapper {
@@ -56,4 +56,11 @@
 
 .return-icon {
     font-size: 20px; 
+}
+
+.messages-scroll-container {
+    max-height: 80vh; /* Ajusta esto según lo que necesites */
+    overflow-y: auto; /* Habilita el desplazamiento vertical */
+    padding: 20px;
+    width: 60%;
 }

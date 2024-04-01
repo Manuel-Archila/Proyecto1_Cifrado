@@ -3,19 +3,32 @@ import './MessagesList.css';
 import NewGroupModal from '../NewGroupModal/NewGroupModal';
 import NewMessageModal from '../NewMessageModal/NewMessageModal';
 import React, {useEffect, useState} from 'react';
+import { useNavigate } from 'react-router-dom';
 
 
 function MessagesList() {
-
-
+    const navigate = useNavigate()
     const [showModal, setShowModal] = useState(false);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [recipient, setRecipient] = useState('');
-    const [messageBody, setMessageBody] = useState('');
     const [users, setUsers] = useState([]);
     const [groups, setGroups] = useState([]);
     const [groupsReal, setGroupsReal] = useState([]);
-    const [userActual, setUserActual] = useState('');
+    const userActual = sessionStorage.getItem('username');
+
+    const DeleteUser = async() => {
+        try{
+            const response = await fetch(`http://localhost:5000/users/${userActual}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const data = await response.json();
+            console.log(data);
+        }
+        catch(error){
+            console.log(error);
+        }
+    }
 
     const getUsers = async() => {
         try{
@@ -54,20 +67,9 @@ function MessagesList() {
         setShowModal(false);
     };
 
-    const toggleModal = () => setIsModalOpen(!isModalOpen);
-
-    const handleSend = () => {
-        console.log(`Sending message to ${recipient}: ${messageBody}`);
-        toggleModal();
-        // Restablece el estado del formulario
-        setRecipient('');
-        setMessageBody('');
-    };
-
     useEffect(() => {
         getUsers();
         getGroups();
-        setUserActual(sessionStorage.getItem('username'));
     }, []);
 
     useEffect(() => {
@@ -78,7 +80,10 @@ function MessagesList() {
 
     return (
         <div className='AppBg'>
-            <h1 style={{color: 'white'}}>Messages</h1>
+            <div className='top-bar'>
+                <h1 className="messages-title" style={{color: 'white'}}>Messages</h1>
+                <button className='delete-button' onClick={() => {DeleteUser(); navigate('/')}}>Eliminar usuario</button>
+            </div>
             <div className='grouped-messages'>
                 <div className='message-group'>
                     <div className="header-container">
