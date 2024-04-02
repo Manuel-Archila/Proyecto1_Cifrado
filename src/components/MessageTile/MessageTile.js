@@ -12,16 +12,63 @@ function MessageTile({ message }) {
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [password, setPassword] = useState('');
+    const [contra, setContra] = useState('');
+    
 
     const handleDeleteGroup = (e) => {
         e.stopPropagation(); // Evita que el evento se propague al div padre
         setIsModalVisible(true);
     };
 
-    const handleConfirmDelete = () => {
-        // Aquí puedes agregar la lógica para eliminar el grupo después de verificar la contraseña
-        console.log(password);
-        console.log(message.nombre);
+
+    const handleConfirmDelete = async() => {
+
+        const getPassword = async() =>{
+            try{
+                const response = await fetch(`http://localhost:5000/groups/${message.nombre}/password`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                const data = await response.json();
+                console.log(data);
+                setContra(data.password);
+                return data.password
+            }
+            catch(error){
+                console.log(error);
+            }
+        }
+
+        const passW = await getPassword()
+        console.log('PASSW', passW)
+
+        
+        
+        
+        if(password === passW){
+            console.log(passW);
+            try{
+                const response = await fetch(`http://localhost:5000/groups/${message.nombre}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                const data = await response.json();
+                console.log(data);
+            }
+            catch(error){
+                console.log(error);
+            }
+
+        } 
+        else{
+            console.log(passW);
+            console.log("Contraseña incorrecta")
+        }
+
         setIsModalVisible(false);
     };
 
@@ -63,17 +110,6 @@ function MessageTile({ message }) {
         };
     }
 
-    // return (
-    //     <div onClick={message.nombre ? goToGroup : goToMessage} className='message-tile'>
-    //         <div className='message-tile-content'>
-    //             <Avatar id='avatar_icon' style={avatar_color} size={64} icon={<UserOutlined />} />
-    //             <p className='msg-content'>{message.nombre ? `Nombre del grupo: ${message.nombre}` : `From: ${message.username}`}</p>
-    //             {/* <p className='msg-content'>To: {message.id_group ? `Grupo #${message.id_group}` : message.username_destino }</p> */}
-    //             {/* <p id='message-content'>{message.message}</p> */}
-    //         </div>
-    //         <Divider id='message_divider' style={{borderTop: '1px solid #252525'}}/>
-    //     </div>
-    // );
     
     return (
         <div className='message-tile'>

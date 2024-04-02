@@ -9,7 +9,8 @@ function NewGroupModal({ isOpen, onClose, allUsers }) {
     const [selectedUsers, setSelectedUsers] = useState([])
     const [clave_simetrica, setClaveSimetrica] = useState('');
 
-    const createNewGroup = async() => {
+    const createNewGroup = async(encryptedPasswordBase64) => {
+        console.log(encryptedPasswordBase64);
         try {
             const response = await fetch('http://localhost:5000/groups', {
                 method: 'POST',
@@ -39,101 +40,76 @@ function NewGroupModal({ isOpen, onClose, allUsers }) {
         }
     }
 
-    const encryptWithAES = async(text, key) => {
-        const iv = new Uint8Array(16); // IV estático, por simplicidad se utiliza un array de ceros.
+    const encryptMessage = async(message, symmetricKeyBase64) => {
+        // Convertir la clave simétrica de base64 a un formato usable
+        const keyBuffer = Uint8Array.from(atob(symmetricKeyBase64), c => c.charCodeAt(0));
+        const importedKey = await window.crypto.subtle.importKey(
+            'raw',
+            keyBuffer,
+            { name: 'AES-GCM' },
+            false,
+            ['encrypt', 'decrypt']
+        );
+    
         const encoder = new TextEncoder();
-        const data = encoder.encode(text);
+        const encodedMessage = encoder.encode(message);
     
-        const encrypted = await window.crypto.subtle.encrypt(
-            {
-                name: "AES-CBC",
-                iv,
-            },
-            key,
-            data
+        // En este caso no usamos IV para simplificar basándonos en tu escenario
+        const encryptedData = await window.crypto.subtle.encrypt(
+            { name: 'AES-GCM', iv: new Uint8Array(12) }, // Aunque no uses IV, es necesario proporcionar uno para AES-GCM
+            importedKey,
+            encodedMessage
         );
     
-        return encrypted;
-    }
-
-    const generateStaticKey = async() => {
-        const key = await window.crypto.subtle.generateKey(
-            {
-                name: "AES-CBC",
-                length: 128,
-            },
-            true,
-            ["encrypt", "decrypt"]
-        );
+        // Convertir datos encriptados a base64 para enviar
+        const base64EncryptedMessage = btoa(String.fromCharCode(...new Uint8Array(encryptedData)));
     
-        return key;
+        return base64EncryptedMessage;
     }
 
-    const generateAndExportSymmetricKey = async()=> {
+    const generateAndExportSymmetricKey = async () => {
         try {
             const key = await window.crypto.subtle.generateKey(
                 {
-                    name: "AES-GCM",
-                    length: 128,
+                    name: 'AES-GCM',
+                    length: 256, // Aumentado a 256 para mayor seguridad.
                 },
                 true,
-                ["encrypt", "decrypt"]
+                ['encrypt', 'decrypt']
             );
-    
-            const exportedKey = await window.crypto.subtle.exportKey("raw", key);
-    
-            return exportedKey;
+
+            const exportedKey = await window.crypto.subtle.exportKey('raw', key);
+
+            // Guarda también la clave para usarla en el cifrado directamente, no solo su versión exportada.
+            return { exportedKey, key };
         } catch (error) {
-            console.error("Error generating or exporting key:", error);
+            console.error('Error generating or exporting key:', error);
             return null;
         }
-    }
-    
+    };
 
     const bufferToBase64 = (buf) => {
         return btoa(String.fromCharCode.apply(null, new Uint8Array(buf)));
-    }
-
-    const base64ToBuffer = (base64) => {
-        const binary_string = window.atob(base64);
-        const len = binary_string.length;
-        const bytes = new Uint8Array(len);
-        for (let i = 0; i < len; i++) {
-            bytes[i] = binary_string.charCodeAt(i);
-        }
-        return bytes.buffer;
-    }
-    
-    
-    
+    };
 
     const handleNewGroupSubmit = async () => {
-        const exportedKeyBuffer = await generateAndExportSymmetricKey();
-        if (!exportedKeyBuffer) {
-            console.error("No se pudo generar la clave.");
+        const { exportedKey } = await generateAndExportSymmetricKey();
+        if (!exportedKey) {
+            console.error('No se pudo generar la clave.');
             return;
         }
-        const exportedKeyBase64 = bufferToBase64(exportedKeyBuffer);
+        const exportedKeyBase64 = bufferToBase64(exportedKey);
         setClaveSimetrica(exportedKeyBase64);
-        
-        const aesKey = await generateStaticKey(); // Asegúrate de tener esta clave generada y accesible
-        const encryptedPassword = await encryptWithAES(password, aesKey);
-        const encryptedPasswordBase64 = bufferToBase64(encryptedPassword);
-        setPassword(encryptedPasswordBase64);
-        
-        
-        console.log("Nombre del grupo:", groupName);
-        console.log("Lista de usuarios:", selectedUsers);
-        console.log("Contraseña:", password);
-        console.log("Clave simétrica en Base64:", exportedKeyBase64);
-        console.log("Contrasena en Base64:", encryptedPasswordBase64);
 
-        createNewGroup();
+        const encryptedPasswordBase64 = await encryptMessage(password, exportedKeyBase64);
+        setPassword(encryptedPasswordBase64);
+
+        createNewGroup(encryptedPasswordBase64);
 
         setGroupName('');
         setSelectedUsers([]);
         setPassword('');
-    
+
         onClose();
     };
     
