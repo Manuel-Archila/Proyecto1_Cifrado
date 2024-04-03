@@ -53,10 +53,12 @@ function NewGroupModal({ isOpen, onClose, allUsers }) {
     
         const encoder = new TextEncoder();
         const encodedMessage = encoder.encode(message);
+
+        const iv = new Uint8Array(12).fill(0);
     
         // En este caso no usamos IV para simplificar basándonos en tu escenario
         const encryptedData = await window.crypto.subtle.encrypt(
-            { name: 'AES-GCM', iv: new Uint8Array(12) }, // Aunque no uses IV, es necesario proporcionar uno para AES-GCM
+            { name: 'AES-GCM', iv: iv }, // Aunque no uses IV, es necesario proporcionar uno para AES-GCM
             importedKey,
             encodedMessage
         );
@@ -72,7 +74,7 @@ function NewGroupModal({ isOpen, onClose, allUsers }) {
             const key = await window.crypto.subtle.generateKey(
                 {
                     name: 'AES-GCM',
-                    length: 256, // Aumentado a 256 para mayor seguridad.
+                    length: 128,
                 },
                 true,
                 ['encrypt', 'decrypt']
@@ -102,6 +104,7 @@ function NewGroupModal({ isOpen, onClose, allUsers }) {
         setClaveSimetrica(exportedKeyBase64);
 
         const encryptedPasswordBase64 = await encryptMessage(password, exportedKeyBase64);
+        console.log("encrypted",encryptedPasswordBase64);
         setPassword(encryptedPasswordBase64);
 
         createNewGroup(encryptedPasswordBase64);

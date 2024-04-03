@@ -21,10 +21,10 @@ function MessageTile({ message }) {
     };
 
 
-    const handleConfirmDelete = async() => {
-
-        const getPassword = async() =>{
-            try{
+    const handleConfirmDelete = async () => {
+        const getPassword = async () => {
+            // Esta función obtiene la contraseña cifrada y la clave simétrica de la base de datos
+            try {
                 const response = await fetch(`http://localhost:5000/groups/${message.nombre}/password`, {
                     method: 'GET',
                     headers: {
@@ -33,22 +33,25 @@ function MessageTile({ message }) {
                 });
                 const data = await response.json();
                 console.log(data);
-                setContra(data.password);
-                return data.password
+                return { encryptedPassword: data.password, symmetricKey: sessionStorage.getItem('group_key') };
+            } catch (error) {
+                console.error(error);
+                return null;
             }
-            catch(error){
-                console.log(error);
-            }
+        };
+    
+        const { encryptedPassword, symmetricKey } = await getPassword();
+    
+        if (!encryptedPassword || !symmetricKey) {
+            console.error("No se pudo obtener la contraseña o la clave simétrica");
+            return;
         }
+    
+        // const decryptedPassword = await decryptMessage(encryptedPassword, symmetricKey);
+    
+        if (password === encryptedPassword) {
+            console.log("Contraseña correcta. Procediendo a eliminar el grupo.");
 
-        const passW = await getPassword()
-        console.log('PASSW', passW)
-
-        
-        
-        
-        if(password === passW){
-            console.log(passW);
             try{
                 const response = await fetch(`http://localhost:5000/groups/${message.nombre}`, {
                     method: 'DELETE',
@@ -62,26 +65,47 @@ function MessageTile({ message }) {
             catch(error){
                 console.log(error);
             }
-
-        } 
-        else{
-            console.log(passW);
-            console.log("Contraseña incorrecta")
+            // Aquí iría la lógica para eliminar el grupo
+        } else {
+            console.error("Contraseña incorrecta");
         }
-
+    
         setIsModalVisible(false);
     };
+    
 
     const handleCancel = () => {
         setIsModalVisible(false);
     };
 
-    const handleTileClick = (e) => {
-        // Verifica si el clic proviene del avatar de eliminación
-        if (!e.target.classList.contains('delete-avatar')) {
-            message.nombre ? goToGroup() : goToMessage();
-        }
+    const decryptMessage = async (encryptedMessageBase64, symmetricKeyBase64) => {
+        console.log(encryptedMessageBase64);
+        console.log(symmetricKeyBase64);
+
+        const keyBuffer = Uint8Array.from(atob(symmetricKeyBase64), c => c.charCodeAt(0));
+        const importedKey = await window.crypto.subtle.importKey(
+            'raw',
+            keyBuffer,
+            { name: 'AES-GCM' },
+            false,
+            ['decrypt'] // Solo necesitamos el permiso de descifrado aquí
+        );
+    
+        // Convertir el mensaje cifrado de base64 a un ArrayBuffer
+        const encryptedData = Uint8Array.from(atob(encryptedMessageBase64), c => c.charCodeAt(0)).buffer;
+    
+        const iv = new Uint8Array(12).fill(0);
+    
+        const decryptedData = await window.crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv: iv },
+            importedKey,
+            encryptedData
+        );
+    
+        const decoder = new TextDecoder();
+        return decoder.decode(decryptedData);
     };
+    
 
     const navigate = useNavigate();
 
